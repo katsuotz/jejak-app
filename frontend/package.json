@@ -23,7 +23,8 @@
     "svelte": "^5.51.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "workbox-window": "^7.4.0"
   },
   "dependencies": {
     "bits-ui": "^2.15.5",

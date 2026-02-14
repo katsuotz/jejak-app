@@ -4,6 +4,7 @@
 	import { themeMode } from '$lib/stores/settings';
 	import { browser } from '$app/environment';
 	import { cn } from '$lib/utils';
+	import PwaUpdate from '$lib/components/PwaUpdate.svelte';
 
 	let { children } = $props();
 
@@ -111,4 +112,6 @@
 			{/each}
 		</div>
 	</nav>
+
+	<PwaUpdate />
 </div>

@@ -1,4 +1,5 @@
 /// <reference types="@sveltejs/kit" />
+/// <reference types="@vite-pwa/sveltekit" />
 
 declare global {
   namespace App {

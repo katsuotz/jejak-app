@@ -10,7 +10,7 @@ export default defineConfig({
 		SvelteKitPWA({
 			srcDir: 'src',
 			strategies: 'generateSW',
-			registerType: 'autoUpdate',
+			registerType: 'prompt',
 			manifest: {
 				name: 'Jejak',
 				short_name: 'Jejak',
