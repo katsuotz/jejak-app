@@ -27,6 +27,13 @@
 	$effect(() => {
 		if (!browser) return;
 
+		// Check for early-captured prompt (from inline script in app.html)
+		if ((window as any).__pwaInstallPrompt) {
+			deferredPrompt = (window as any).__pwaInstallPrompt;
+			(window as any).__pwaInstallPrompt = null;
+			showInstall = true;
+		}
+
 		const handler = (e: Event) => {
 			e.preventDefault();
 			deferredPrompt = e;
