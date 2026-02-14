@@ -2,7 +2,7 @@
   import { useRegisterSW } from 'virtual:pwa-register/svelte';
 
   const { needRefresh, updateServiceWorker } = useRegisterSW({
-    onRegisteredSW(swUrl, r) {
+    onRegisteredSW(swUrl: string, r: ServiceWorkerRegistration | undefined) {
       if (r) {
         setInterval(async () => {
           if (r.installing || !navigator) return;
