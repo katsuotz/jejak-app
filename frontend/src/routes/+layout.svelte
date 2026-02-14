@@ -14,6 +14,7 @@
 
 	const navItems = [
 		{ href: '/', label: 'Metronome', icon: '🎵' },
+		{ href: '/workouts', label: 'Workouts', icon: '🏋️' },
 		{ href: '/presets', label: 'Presets', icon: '💾' },
 		{ href: '/history', label: 'History', icon: '📊' }
 	];
