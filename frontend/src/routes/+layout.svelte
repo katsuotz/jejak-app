@@ -10,6 +10,7 @@
 
 	let deferredPrompt: any = $state(null);
 	let showInstall = $state(false);
+	let isStandalone = $state(false);
 
 	const navItems = [
 		{ href: '/', label: 'Metronome', icon: '🎵' },
@@ -27,11 +28,12 @@
 	$effect(() => {
 		if (!browser) return;
 
+		isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
 		// Check for early-captured prompt (from inline script in app.html)
 		if ((window as any).__pwaInstallPrompt) {
 			deferredPrompt = (window as any).__pwaInstallPrompt;
 			(window as any).__pwaInstallPrompt = null;
-			showInstall = true;
 		}
 
 		const handler = (e: Event) => {
@@ -42,22 +44,30 @@
 
 		window.addEventListener('beforeinstallprompt', handler);
 
-		// Hide if already installed
-		if (window.matchMedia('(display-mode: standalone)').matches) {
-			showInstall = false;
+		// Show install button if not already installed as standalone
+		if (!isStandalone) {
+			showInstall = true;
 		}
 
 		return () => window.removeEventListener('beforeinstallprompt', handler);
 	});
 
 	async function installApp() {
-		if (!deferredPrompt) return;
-		deferredPrompt.prompt();
-		const { outcome } = await deferredPrompt.userChoice;
-		if (outcome === 'accepted') {
-			showInstall = false;
+		if (deferredPrompt) {
+			deferredPrompt.prompt();
+			const { outcome } = await deferredPrompt.userChoice;
+			if (outcome === 'accepted') {
+				showInstall = false;
+			}
+			deferredPrompt = null;
+		} else {
+			// Fallback: show manual instructions
+			const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+			const msg = isIOS
+				? 'Tap the Share button, then "Add to Home Screen"'
+				: 'Tap the browser menu (⋮), then "Add to Home Screen" or "Install App"';
+			alert(msg);
 		}
-		deferredPrompt = null;
 	}
 
 	function toggleTheme() {

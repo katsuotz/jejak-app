@@ -3,9 +3,16 @@
 
 	const { needRefresh, updateServiceWorker } = useRegisterSW({
 		onRegisteredSW(swUrl, r) {
-			// Check for updates every 60 seconds
 			if (r) {
-				setInterval(() => r.update(), 60 * 1000);
+				setInterval(async () => {
+					if (r.installing || !navigator) return;
+					if ('connection' in navigator && !navigator.onLine) return;
+					try {
+						await r.update();
+					} catch (e) {
+						console.warn('SW update check failed:', e);
+					}
+				}, 60 * 1000);
 			}
 		}
 	});
