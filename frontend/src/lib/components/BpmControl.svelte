@@ -1,0 +1,66 @@
+<script lang="ts">
+	import Button from '$lib/components/ui/button/Button.svelte';
+
+	let { value = $bindable(170), min = 60, max = 240 }: { value?: number; min?: number; max?: number } = $props();
+
+	function adjust(delta: number) {
+		value = Math.max(min, Math.min(max, value + delta));
+	}
+</script>
+
+<div class="flex flex-col items-center gap-3">
+	<span class="text-muted-foreground text-xs font-medium uppercase tracking-widest">BPM</span>
+	<div class="flex items-center gap-4">
+		<Button variant="secondary" size="icon" onclick={() => adjust(-5)} class="h-12 w-12 rounded-full text-lg">
+			−5
+		</Button>
+		<Button variant="secondary" size="icon" onclick={() => adjust(-1)} class="h-10 w-10 rounded-full">
+			−
+		</Button>
+		<span class="tabular-nums text-6xl font-bold text-primary min-w-[4ch] text-center">{value}</span>
+		<Button variant="secondary" size="icon" onclick={() => adjust(1)} class="h-10 w-10 rounded-full">
+			+
+		</Button>
+		<Button variant="secondary" size="icon" onclick={() => adjust(5)} class="h-12 w-12 rounded-full text-lg">
+			+5
+		</Button>
+	</div>
+	<input
+		type="range"
+		bind:value
+		{min}
+		{max}
+		step="1"
+		class="bpm-slider mt-2 w-full max-w-xs"
+	/>
+</div>
+
+<style>
+	.bpm-slider {
+		-webkit-appearance: none;
+		appearance: none;
+		height: 6px;
+		border-radius: 9999px;
+		background: var(--color-secondary);
+		outline: none;
+	}
+
+	.bpm-slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		background: var(--color-primary);
+		cursor: pointer;
+	}
+
+	.bpm-slider::-moz-range-thumb {
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		background: var(--color-primary);
+		cursor: pointer;
+		border: none;
+	}
+</style>
