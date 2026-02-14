@@ -1,0 +1,44 @@
+name: Deploy Jejak
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: env
+
+    steps:
+      - name: 🚀 SSH into server and deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            APP_DIR="/var/www/jejak"
+            BRANCH="main"
+
+            export PNPM_HOME="$HOME/.local/share/pnpm"
+            export PATH="$PNPM_HOME:$PATH"
+            command -v pnpm >/dev/null || { echo "pnpm not found on server PATH"; exit 1; }
+
+            cd "$APP_DIR"
+            git fetch
+            git reset --hard "origin/$BRANCH"
+
+            cd frontend
+            pnpm install --frozen-lockfile
+            pnpm build
+
+            sudo systemctl reload nginx
