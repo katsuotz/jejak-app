@@ -26,7 +26,7 @@ jobs:
           script: |
             set -euo pipefail
 
-            APP_DIR="/var/www/jejak"
+            APP_DIR="/var/www/jejak-app"
             BRANCH="main"
 
             export PNPM_HOME="$HOME/.local/share/pnpm"
