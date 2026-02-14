@@ -9,8 +9,14 @@
 
     <!-- SEO -->
     <title>Jejak — Running Cadence Metronome</title>
-    <meta name="description" content="Improve your running cadence with Jejak. A mobile-first metronome PWA with adjustable BPM, sound choices, run/walk intervals, and session tracking." />
-    <meta name="keywords" content="running, cadence, metronome, BPM, running app, stride, run walk interval, PWA" />
+    <meta
+      name="description"
+      content="Improve your running cadence with Jejak. A mobile-first metronome PWA with adjustable BPM, sound choices, run/walk intervals, and session tracking."
+    />
+    <meta
+      name="keywords"
+      content="running, cadence, metronome, BPM, running app, stride, run walk interval, PWA"
+    />
     <meta name="author" content="Jejak" />
     <meta name="robots" content="index, follow" />
 
@@ -22,14 +28,20 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Jejak — Running Cadence Metronome" />
-    <meta property="og:description" content="Improve your running cadence with Jejak. A mobile-first metronome PWA with adjustable BPM, sound choices, run/walk intervals, and session tracking." />
+    <meta
+      property="og:description"
+      content="Improve your running cadence with Jejak. A mobile-first metronome PWA with adjustable BPM, sound choices, run/walk intervals, and session tracking."
+    />
     <meta property="og:image" content="%sveltekit.assets%/icons/icon-512.png" />
     <meta property="og:site_name" content="Jejak" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Jejak — Running Cadence Metronome" />
-    <meta name="twitter:description" content="Improve your running cadence with Jejak. A mobile-first metronome PWA with adjustable BPM, sound choices, run/walk intervals, and session tracking." />
+    <meta
+      name="twitter:description"
+      content="Improve your running cadence with Jejak. A mobile-first metronome PWA with adjustable BPM, sound choices, run/walk intervals, and session tracking."
+    />
     <meta name="twitter:image" content="%sveltekit.assets%/icons/icon-512.png" />
 
     <!-- Mobile -->
@@ -49,7 +61,7 @@
     <script>
       // Capture beforeinstallprompt early before Svelte hydrates
       window.__pwaInstallPrompt = null;
-      window.addEventListener('beforeinstallprompt', function(e) {
+      window.addEventListener('beforeinstallprompt', function (e) {
         e.preventDefault();
         window.__pwaInstallPrompt = e;
       });

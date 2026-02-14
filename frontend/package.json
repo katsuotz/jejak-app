@@ -7,8 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "oxlint src/",
-    "format": "oxfmt --write src/",
-    "format:check": "oxfmt --check src/"
+    "format": "oxfmt --write src/ && prettier --write src/**/*.svelte",
+    "format:check": "oxfmt --check src/ && prettier --check src/**/*.svelte"
   },
   "type": "module",
   "devDependencies": {
@@ -19,6 +19,8 @@
     "@vite-pwa/sveltekit": "^1.1.0",
     "oxfmt": "^0.32.0",
     "oxlint": "^1.47.0",
+    "prettier": "^3.8.1",
+    "prettier-plugin-svelte": "^3.4.1",
     "shadcn-svelte": "1.0.0-next.19",
     "svelte": "^5.51.0",
     "tailwindcss": "^4.1.18",

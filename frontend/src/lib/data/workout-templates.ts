@@ -20,10 +20,7 @@ function s(seconds: number): number {
   return seconds;
 }
 
-function repeat(
-  count: number,
-  phases: WorkoutPhase[],
-): WorkoutPhase[] {
+function repeat(count: number, phases: WorkoutPhase[]): WorkoutPhase[] {
   const result: WorkoutPhase[] = [];
   for (let i = 0; i < count; i++) {
     result.push(
