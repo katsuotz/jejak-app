@@ -7,6 +7,9 @@
 
 	let { children } = $props();
 
+	let deferredPrompt: any = $state(null);
+	let showInstall = $state(false);
+
 	const navItems = [
 		{ href: '/', label: 'Metronome', icon: '🎵' },
 		{ href: '/presets', label: 'Presets', icon: '💾' },
@@ -19,6 +22,35 @@
 			document.documentElement.classList.add($themeMode);
 		}
 	});
+
+	$effect(() => {
+		if (!browser) return;
+
+		const handler = (e: Event) => {
+			e.preventDefault();
+			deferredPrompt = e;
+			showInstall = true;
+		};
+
+		window.addEventListener('beforeinstallprompt', handler);
+
+		// Hide if already installed
+		if (window.matchMedia('(display-mode: standalone)').matches) {
+			showInstall = false;
+		}
+
+		return () => window.removeEventListener('beforeinstallprompt', handler);
+	});
+
+	async function installApp() {
+		if (!deferredPrompt) return;
+		deferredPrompt.prompt();
+		const { outcome } = await deferredPrompt.userChoice;
+		if (outcome === 'accepted') {
+			showInstall = false;
+		}
+		deferredPrompt = null;
+	}
 
 	function toggleTheme() {
 		$themeMode = $themeMode === 'dark' ? 'light' : 'dark';
@@ -33,14 +65,26 @@
 	<!-- Header -->
 	<header class="sticky top-0 z-50 flex items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-4 py-3">
 		<h1 class="text-lg font-bold text-primary">Jejak</h1>
-		<button
-			onclick={toggleTheme}
-			aria-label="Toggle theme"
-			class="flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-		>
-			<span>{themeIcon($themeMode)}</span>
-			<span class="capitalize text-xs">{$themeMode}</span>
-		</button>
+		<div class="flex items-center gap-2">
+			{#if showInstall}
+				<button
+					onclick={installApp}
+					aria-label="Install app"
+					class="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm text-primary-foreground font-medium transition-colors hover:bg-primary/90 active:scale-95"
+				>
+					<span>📲</span>
+					<span class="text-xs">Install</span>
+				</button>
+			{/if}
+			<button
+				onclick={toggleTheme}
+				aria-label="Toggle theme"
+				class="flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+			>
+				<span>{themeIcon($themeMode)}</span>
+				<span class="capitalize text-xs">{$themeMode}</span>
+			</button>
+		</div>
 	</header>
 
 	<!-- Content -->
