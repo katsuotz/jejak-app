@@ -326,9 +326,7 @@
     <Button
       size="xl"
       variant={isPlaying ? 'destructive' : 'default'}
-      class="w-full max-w-xs h-16 rounded-2xl text-xl font-bold shadow-lg {isPlaying
-        ? ''
-        : 'animate-pulse'}"
+      class="w-full max-w-xs h-16 rounded-2xl text-xl font-bold shadow-lg"
       onclick={toggleSession}>
       {isPlaying ? '⏹ Stop' : hasWorkout ? '▶ Start Workout' : '▶ Start'}
     </Button>
