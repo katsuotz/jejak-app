@@ -8,6 +8,22 @@ Jejak is a mobile-first PWA that helps runners improve their cadence using a rea
 
 ```
 running-app/
+├── backend/               # Rust Actix-web API server
+│   ├── src/
+│   │   ├── main.rs       # Server entry point
+│   │   ├── lib.rs        # Library root for shared code
+│   │   ├── modules/      # Feature modules (modular architecture)
+│   │   │   ├── mod.rs    # Module exports
+│   │   │   └── workout/  # Workout module
+│   │   │       ├── mod.rs        # Module entry, re-exports
+│   │   │       ├── model.rs      # Workout, WorkoutPhase, WorkoutResponse
+│   │   │       ├── repository.rs # WorkoutRepository (data access)
+│   │   │       └── routes.rs     # HTTP handlers (/api/workouts)
+│   │   └── bin/
+│   │       └── seed.rs   # Database seeder binary
+│   ├── migrations/       # SQLx migrations
+│   ├── Cargo.toml       # Rust dependencies
+│   └── .env             # Environment config (not committed)
 ├── frontend/              # SvelteKit PWA (the main application)
 │   ├── src/
 │   │   ├── app.html       # HTML shell with SEO meta tags
@@ -61,7 +77,8 @@ running-app/
 
 ## Tech Stack
 
-- **Framework**: SvelteKit with Svelte 5 (runes: `$state`, `$derived`, `$effect`, `$props`, `$bindable`)
+- **Frontend**: SvelteKit with Svelte 5 (runes: `$state`,effect`, `$props `$derived`, `$`, `$bindable`)
+- **Backend**: Rust with Actix-web and SQLx (PostgreSQL)
 - **Styling**: Tailwind CSS v4 with `@theme` tokens, shadcn-svelte components
 - **Audio**: Web Audio API with `AudioContext` and `OscillatorNode` for jitter-free scheduling
 - **PWA**: `@vite-pwa/sveltekit` with `generateSW` strategy, `registerType: 'prompt'`
@@ -74,6 +91,7 @@ running-app/
 ## Conventions
 
 ### Code Style
+
 - **Svelte 5 runes only** — no legacy `$:` reactive statements, no `export let`. Use `$state()`, `$derived()`, `$effect()`, `$props()`, `$bindable()`.
 - **TypeScript strict** — all stores and components are fully typed.
 - **2-space indentation, no tabs** — enforced by oxfmt and Prettier.
@@ -82,22 +100,27 @@ running-app/
 - **Tailwind utility classes** — no custom CSS unless in `app.css` theme layer.
 
 ### Component Patterns
+
 - Components use `$props()` with destructuring and type annotations.
 - Bindable props use `$bindable()`.
 - Components are in `src/lib/components/`, one component per file.
 - shadcn-svelte primitives live in `src/lib/components/ui/`.
 
 ### Store Patterns
+
 - All persistent stores use `createPersistedStore()` from `settings.ts` which wraps `writable` with `localStorage`.
 - localStorage keys are prefixed with `jejak:` (e.g., `jejak:metronome`, `jejak:presets`).
 - Non-persistent stores (like `workoutStore`) use plain `writable` with custom methods.
 
 ### Routing
+
 - SvelteKit file-based routing under `src/routes/`.
 - Static adapter — all pages are prerendered to `build/`.
 - SPA fallback via `index.html` (configured in adapter and nginx).
 
 ## Commands
+
+### Frontend
 
 ```bash
 pnpm dev            # Start dev server (localhost:5173)
@@ -111,6 +134,27 @@ pnpm build:ios      # Build web + sync to iOS
 pnpm cap:sync       # Sync web assets to native projects
 pnpm cap:android    # Open Android project in Android Studio
 pnpm cap:ios        # Open iOS project in Xcode
+```
+
+### Backend
+
+```bash
+cd backend
+
+# Install dependencies and sqlx-cli for migrations
+cargo install sqlx-cli --no-default-features --features postgres
+
+# Create the database (one-time setup)
+sqlx database create
+
+# Run database migrations
+sqlx migrate run
+
+# Start the API server (runs migrations automatically)
+cargo run
+
+# Seed the database with workout templates
+cargo run --bin seed
 ```
 
 ## Key Architecture Decisions

@@ -12,126 +12,50 @@ export interface WorkoutTemplate {
   phases: WorkoutPhase[];
 }
 
-function m(minutes: number): number {
-  return minutes * 60;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+function transformPhase(phase: {
+  name: string;
+  duration_seconds: number;
+  bpm: number;
+}): WorkoutPhase {
+  return {
+    name: phase.name,
+    durationSeconds: phase.duration_seconds,
+    bpm: phase.bpm,
+  };
 }
 
-function s(seconds: number): number {
-  return seconds;
+function transformWorkout(workout: {
+  id: string;
+  name: string;
+  total_duration_minutes: number;
+  description: string;
+  phases: { name: string; duration_seconds: number; bpm: number }[];
+}): WorkoutTemplate {
+  return {
+    id: workout.id,
+    name: workout.name,
+    totalDurationMinutes: workout.total_duration_minutes,
+    description: workout.description,
+    phases: workout.phases.map(transformPhase),
+  };
 }
 
-function repeat(count: number, phases: WorkoutPhase[]): WorkoutPhase[] {
-  const result: WorkoutPhase[] = [];
-  for (let i = 0; i < count; i++) {
-    result.push(
-      ...phases.map((p) => ({
-        ...p,
-        name: `${p.name} (${i + 1}/${count})`,
-      })),
-    );
+export async function fetchWorkouts(): Promise<WorkoutTemplate[]> {
+  const response = await fetch(`${API_URL}/api/workouts`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch workouts');
   }
-  return result;
+  const data = await response.json();
+  return data.map(transformWorkout);
 }
 
-export const workoutTemplates: WorkoutTemplate[] = [
-  {
-    id: 'recovery',
-    name: 'Recovery',
-    totalDurationMinutes: 20,
-    description: 'Light recovery run with low cadence',
-    phases: [
-      { name: 'Warmup', durationSeconds: m(5), bpm: 160 },
-      { name: 'Easy', durationSeconds: m(10), bpm: 168 },
-      { name: 'Cooldown', durationSeconds: m(5), bpm: 156 },
-    ],
-  },
-  {
-    id: 'easy-run',
-    name: 'Easy Run (short)',
-    totalDurationMinutes: 30,
-    description: 'Short easy-paced run',
-    phases: [
-      { name: 'Warmup', durationSeconds: m(6), bpm: 162 },
-      { name: 'Easy', durationSeconds: m(20), bpm: 170 },
-      { name: 'Cooldown', durationSeconds: m(4), bpm: 156 },
-    ],
-  },
-  {
-    id: 'aerobic-steady',
-    name: 'Aerobic Steady',
-    totalDurationMinutes: 40,
-    description: 'Sustained aerobic effort at steady cadence',
-    phases: [
-      { name: 'Warmup', durationSeconds: m(8), bpm: 162 },
-      { name: 'Steady', durationSeconds: m(28), bpm: 174 },
-      { name: 'Cooldown', durationSeconds: m(4), bpm: 156 },
-    ],
-  },
-  {
-    id: 'long-easy',
-    name: 'Long Easy',
-    totalDurationMinutes: 60,
-    description: 'Long easy run for building endurance',
-    phases: [
-      { name: 'Warmup', durationSeconds: m(8), bpm: 162 },
-      { name: 'Easy', durationSeconds: m(46), bpm: 170 },
-      { name: 'Cooldown', durationSeconds: m(6), bpm: 156 },
-    ],
-  },
-  {
-    id: 'tempo-blocks',
-    name: 'Tempo Blocks',
-    totalDurationMinutes: 42,
-    description: '3 × 6-min tempo blocks with 2-min easy recovery',
-    phases: [
-      { name: 'Warmup', durationSeconds: m(12), bpm: 162 },
-      ...repeat(3, [
-        { name: 'Tempo', durationSeconds: m(6), bpm: 180 },
-        { name: 'Easy', durationSeconds: m(2), bpm: 168 },
-      ]),
-      { name: 'Cooldown', durationSeconds: m(8), bpm: 156 },
-    ],
-  },
-  {
-    id: '1min-intervals',
-    name: '1:00 Intervals',
-    totalDurationMinutes: 38,
-    description: '10 × 1-min hard with 1-min easy recovery',
-    phases: [
-      { name: 'Warmup', durationSeconds: m(12), bpm: 162 },
-      ...repeat(10, [
-        { name: 'Hard', durationSeconds: m(1), bpm: 186 },
-        { name: 'Easy', durationSeconds: m(1), bpm: 168 },
-      ]),
-      { name: 'Cooldown', durationSeconds: m(6), bpm: 156 },
-    ],
-  },
-  {
-    id: 'hill-simulation',
-    name: 'Hill Simulation',
-    totalDurationMinutes: 44,
-    description: '8 × 1:30 uphill simulation with downhill recovery',
-    phases: [
-      { name: 'Warmup', durationSeconds: m(12), bpm: 162 },
-      ...repeat(8, [
-        { name: 'Up', durationSeconds: s(90), bpm: 184 },
-        { name: 'Down', durationSeconds: s(90), bpm: 168 },
-      ]),
-      { name: 'Cooldown', durationSeconds: m(8), bpm: 156 },
-    ],
-  },
-  {
-    id: 'strides',
-    name: 'Strides',
-    totalDurationMinutes: 30,
-    description: '8 × 20-sec fast strides with 70-sec easy recovery',
-    phases: [
-      { name: 'Warmup', durationSeconds: m(12), bpm: 162 },
-      ...repeat(8, [
-        { name: 'Fast', durationSeconds: s(20), bpm: 190 },
-        { name: 'Easy', durationSeconds: s(70), bpm: 168 },
-      ]),
-      { name: 'Cooldown', durationSeconds: m(6), bpm: 156 },
-    ],
-  },
-];
+export async function fetchWorkoutById(id: string): Promise<WorkoutTemplate> {
+  const response = await fetch(`${API_URL}/api/workouts/${id}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch workout');
+  }
+  const data = await response.json();
+  return transformWorkout(data);
+}

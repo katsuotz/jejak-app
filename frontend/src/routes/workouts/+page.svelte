@@ -1,8 +1,23 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { workoutTemplates } from '$lib/data/workout-templates';
+  import { fetchWorkouts, type WorkoutTemplate } from '$lib/data/workout-templates';
   import { workoutStore } from '$lib/stores/workout';
-  import type { WorkoutTemplate } from '$lib/data/workout-templates';
+
+  let workoutTemplates = $state<WorkoutTemplate[]>([]);
+  let loading = $state(true);
+  let error = $state<string | null>(null);
+
+  async function loadWorkouts() {
+    try {
+      workoutTemplates = await fetchWorkouts();
+    } catch (e) {
+      error = e instanceof Error ? e.message : 'Failed to load workouts';
+    } finally {
+      loading = false;
+    }
+  }
+
+  loadWorkouts();
 
   function formatDuration(seconds: number): string {
     const m = Math.floor(seconds / 60);
@@ -37,60 +52,71 @@
     </p>
   </div>
 
-  <div class="flex flex-col gap-3">
-    {#each workoutTemplates as template}
-      <button
-        onclick={() => startWorkout(template)}
-        class="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 text-left transition-colors hover:bg-accent active:scale-[0.98]">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base font-semibold text-foreground">
-            {template.name}
-          </h3>
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-medium {difficultyColor(template.id)}">
-              {difficultyLabel(template.id)}
-            </span>
-            <span
-              class="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
-              {template.totalDurationMinutes} min
-            </span>
-          </div>
-        </div>
-        <p class="text-xs text-muted-foreground">{template.description}</p>
-
-        <!-- Phase timeline -->
-        <div class="flex w-full gap-0.5 rounded-full overflow-hidden h-2 mt-1">
-          {#each template.phases as phase}
-            {@const widthPct = (phase.durationSeconds / (template.totalDurationMinutes * 60)) * 100}
-            <div
-              class="h-full rounded-sm {phase.bpm >= 180
-                ? 'bg-red-500'
-                : phase.bpm >= 170
-                  ? 'bg-yellow-500'
-                  : 'bg-green-500'}"
-              style="width: {widthPct}%"
-              title="{phase.name} — {formatDuration(phase.durationSeconds)} @ {phase.bpm} spm">
-            </div>
-          {/each}
-        </div>
-
-        <!-- Phase details -->
-        <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1">
-          {#each template.phases as phase, i}
-            {@const isLast = i === template.phases.length - 1}
-            {@const isDuplicate =
-              i > 0 &&
-              phase.name === template.phases[i - 1].name &&
-              phase.bpm === template.phases[i - 1].bpm}
-            {#if !isDuplicate}
-              <span class="text-[10px] text-muted-foreground">
-                {phase.name.replace(/ \(\d+\/\d+\)/, '')}
-                {phase.bpm}
+  {#if loading}
+    <div class="flex items-center justify-center py-12">
+      <p class="text-muted-foreground">Loading workouts...</p>
+    </div>
+  {:else if error}
+    <div class="flex items-center justify-center py-12">
+      <p class="text-red-500">{error}</p>
+    </div>
+  {:else}
+    <div class="flex flex-col gap-3">
+      {#each workoutTemplates as template}
+        <button
+          onclick={() => startWorkout(template)}
+          class="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 text-left transition-colors hover:bg-accent active:scale-[0.98]">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-semibold text-foreground">
+              {template.name}
+            </h3>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-medium {difficultyColor(template.id)}">
+                {difficultyLabel(template.id)}
               </span>
-            {/if}
-          {/each}
-        </div>
-      </button>
-    {/each}
-  </div>
+              <span
+                class="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                {template.totalDurationMinutes} min
+              </span>
+            </div>
+          </div>
+          <p class="text-xs text-muted-foreground">{template.description}</p>
+
+          <!-- Phase timeline -->
+          <div class="flex w-full gap-0.5 rounded-full overflow-hidden h-2 mt-1">
+            {#each template.phases as phase}
+              {@const widthPct =
+                (phase.durationSeconds / (template.totalDurationMinutes * 60)) * 100}
+              <div
+                class="h-full rounded-sm {phase.bpm >= 180
+                  ? 'bg-red-500'
+                  : phase.bpm >= 170
+                    ? 'bg-yellow-500'
+                    : 'bg-green-500'}"
+                style="width: {widthPct}%"
+                title="{phase.name} — {formatDuration(phase.durationSeconds)} @ {phase.bpm} spm">
+              </div>
+            {/each}
+          </div>
+
+          <!-- Phase details -->
+          <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1">
+            {#each template.phases as phase, i}
+              {@const isLast = i === template.phases.length - 1}
+              {@const isDuplicate =
+                i > 0 &&
+                phase.name === template.phases[i - 1].name &&
+                phase.bpm === template.phases[i - 1].bpm}
+              {#if !isDuplicate}
+                <span class="text-[10px] text-muted-foreground">
+                  {phase.name.replace(/ \(\d+\/\d+\)/, '')}
+                  {phase.bpm}
+                </span>
+              {/if}
+            {/each}
+          </div>
+        </button>
+      {/each}
+    </div>
+  {/if}
 </div>
