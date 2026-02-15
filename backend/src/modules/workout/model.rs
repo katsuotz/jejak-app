@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkoutPhase {
@@ -11,11 +12,12 @@ pub struct WorkoutPhase {
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct Workout {
-    pub id: String,
+    pub id: Uuid,
     pub name: String,
     pub total_duration_minutes: i32,
     pub description: String,
     pub phases: Vec<WorkoutPhase>,
+    pub order: i32,
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
     pub updated_at: Option<chrono::DateTime<chrono::Utc>>,
 }
@@ -28,4 +30,5 @@ pub struct WorkoutResponse {
     pub total_duration_minutes: i32,
     pub description: String,
     pub phases: Vec<WorkoutPhase>,
+    pub order: i32,
 }

@@ -1,7 +1,8 @@
-use jejak_backend::workout::{WorkoutPhase, WorkoutResponse};
+use jejak_backend::workout::WorkoutPhase;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 use tracing::{error, info};
+use uuid::Uuid;
 
 fn m(minutes: i32) -> i32 {
     minutes * 60
@@ -25,10 +26,20 @@ fn repeat(count: i32, phases: Vec<WorkoutPhase>) -> Vec<WorkoutPhase> {
     result
 }
 
-fn get_workout_templates() -> Vec<WorkoutResponse> {
+struct WorkoutTemplate {
+    id: Uuid,
+    order: i32,
+    name: String,
+    total_duration_minutes: i32,
+    description: String,
+    phases: Vec<WorkoutPhase>,
+}
+
+fn get_workout_templates() -> Vec<WorkoutTemplate> {
     vec![
-        WorkoutResponse {
-            id: "recovery".to_string(),
+        WorkoutTemplate {
+            id: Uuid::now_v7(),
+            order: 1,
             name: "Recovery".to_string(),
             total_duration_minutes: 20,
             description: "Light recovery run with low cadence".to_string(),
@@ -50,8 +61,9 @@ fn get_workout_templates() -> Vec<WorkoutResponse> {
                 },
             ],
         },
-        WorkoutResponse {
-            id: "easy-run".to_string(),
+        WorkoutTemplate {
+            id: Uuid::now_v7(),
+            order: 2,
             name: "Easy Run (short)".to_string(),
             total_duration_minutes: 30,
             description: "Short easy-paced run".to_string(),
@@ -73,8 +85,9 @@ fn get_workout_templates() -> Vec<WorkoutResponse> {
                 },
             ],
         },
-        WorkoutResponse {
-            id: "aerobic-steady".to_string(),
+        WorkoutTemplate {
+            id: Uuid::now_v7(),
+            order: 3,
             name: "Aerobic Steady".to_string(),
             total_duration_minutes: 40,
             description: "Sustained aerobic effort at steady cadence".to_string(),
@@ -96,8 +109,9 @@ fn get_workout_templates() -> Vec<WorkoutResponse> {
                 },
             ],
         },
-        WorkoutResponse {
-            id: "long-easy".to_string(),
+        WorkoutTemplate {
+            id: Uuid::now_v7(),
+            order: 4,
             name: "Long Easy".to_string(),
             total_duration_minutes: 60,
             description: "Long easy run for building endurance".to_string(),
@@ -119,8 +133,9 @@ fn get_workout_templates() -> Vec<WorkoutResponse> {
                 },
             ],
         },
-        WorkoutResponse {
-            id: "tempo-blocks".to_string(),
+        WorkoutTemplate {
+            id: Uuid::now_v7(),
+            order: 5,
             name: "Tempo Blocks".to_string(),
             total_duration_minutes: 42,
             description: "3 × 6-min tempo blocks with 2-min easy recovery".to_string(),
@@ -153,8 +168,9 @@ fn get_workout_templates() -> Vec<WorkoutResponse> {
                 phases
             },
         },
-        WorkoutResponse {
-            id: "1min-intervals".to_string(),
+        WorkoutTemplate {
+            id: Uuid::now_v7(),
+            order: 6,
             name: "1:00 Intervals".to_string(),
             total_duration_minutes: 38,
             description: "10 × 1-min hard with 1-min easy recovery".to_string(),
@@ -187,8 +203,9 @@ fn get_workout_templates() -> Vec<WorkoutResponse> {
                 phases
             },
         },
-        WorkoutResponse {
-            id: "hill-simulation".to_string(),
+        WorkoutTemplate {
+            id: Uuid::now_v7(),
+            order: 7,
             name: "Hill Simulation".to_string(),
             total_duration_minutes: 44,
             description: "8 × 1:30 uphill simulation with downhill recovery".to_string(),
@@ -221,8 +238,9 @@ fn get_workout_templates() -> Vec<WorkoutResponse> {
                 phases
             },
         },
-        WorkoutResponse {
-            id: "strides".to_string(),
+        WorkoutTemplate {
+            id: Uuid::now_v7(),
+            order: 8,
             name: "Strides".to_string(),
             total_duration_minutes: 30,
             description: "8 × 20-sec fast strides with 70-sec easy recovery".to_string(),
@@ -282,21 +300,23 @@ async fn main() -> std::io::Result<()> {
 
         let result = sqlx::query(
             r#"
-            INSERT INTO workouts (id, name, total_duration_minutes, description, phases)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO workouts (id, name, total_duration_minutes, description, phases, "order")
+            VALUES ($1, $2, $3, $4, $5, $6)
             ON CONFLICT (id) DO UPDATE SET
                 name = EXCLUDED.name,
                 total_duration_minutes = EXCLUDED.total_duration_minutes,
                 description = EXCLUDED.description,
                 phases = EXCLUDED.phases,
+                "order" = EXCLUDED."order",
                 updated_at = NOW()
             "#,
         )
-        .bind(&template.id)
+        .bind(template.id)
         .bind(&template.name)
         .bind(template.total_duration_minutes)
         .bind(&template.description)
         .bind(phases_json)
+        .bind(template.order)
         .execute(&pool)
         .await;
 
