@@ -8,10 +8,18 @@
     "preview": "vite preview",
     "lint": "oxlint src/",
     "format": "oxfmt --write src/ && prettier --write src/**/*.svelte",
-    "format:check": "oxfmt --check src/ && prettier --check src/**/*.svelte"
+    "format:check": "oxfmt --check src/ && prettier --check src/**/*.svelte",
+    "cap:sync": "cap sync",
+    "cap:android": "cap open android",
+    "cap:ios": "cap open ios",
+    "build:android": "vite build && cap sync android",
+    "build:ios": "vite build && cap sync ios"
   },
   "type": "module",
   "devDependencies": {
+    "@capacitor/android": "^8.1.0",
+    "@capacitor/cli": "^8.1.0",
+    "@capacitor/ios": "^8.1.0",
     "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "^2.51.0",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
@@ -29,6 +37,7 @@
     "workbox-window": "^7.4.0"
   },
   "dependencies": {
+    "@capacitor/core": "^8.1.0",
     "bits-ui": "^2.15.5",
     "clsx": "^2.1.1",
     "lucide-svelte": "^0.564.0",
