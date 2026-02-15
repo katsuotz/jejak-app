@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/ui/button/Button.svelte';
+  import Slider from '$lib/components/ui/slider/Slider.svelte';
 
   let {
     value = $bindable(170),
@@ -47,35 +48,5 @@
       +5
     </Button>
   </div>
-  <input type="range" bind:value {min} {max} step="1" class="bpm-slider mt-2 w-full max-w-xs" />
+  <Slider type="single" bind:value {min} {max} step={1} class="mt-2 w-full max-w-xs" />
 </div>
-
-<style>
-  .bpm-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 6px;
-    border-radius: 9999px;
-    background: var(--color-secondary);
-    outline: none;
-  }
-
-  .bpm-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    cursor: pointer;
-  }
-
-  .bpm-slider::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    cursor: pointer;
-    border: none;
-  }
-</style>

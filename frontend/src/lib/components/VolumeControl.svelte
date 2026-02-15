@@ -19,7 +19,7 @@
   </span>
   <div class="flex items-center gap-3">
     <span class="text-lg">{getVolumeIcon(value)}</span>
-    <Slider bind:value min={0} max={1} step={0.01} class="flex-1" />
+    <Slider type="single" bind:value min={0} max={1} step={0.01} class="flex-1" />
     <span class="text-muted-foreground text-sm tabular-nums w-10 text-right">{volumePercent}%</span>
   </div>
 </div>
